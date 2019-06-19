@@ -4,22 +4,86 @@
  * @namespace Slick
  */
 
-(function ($) {
+// (function ($) {
   // register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "Editors": {
-        "Text": TextEditor,
-        "Integer": IntegerEditor,
-        "Float": FloatEditor,
-        "Date": DateEditor,
-        "YesNoSelect": YesNoSelectEditor,
-        "Checkbox": CheckboxEditor,
-        "PercentComplete": PercentCompleteEditor,
-        "LongText": LongTextEditor
-      }
-    }
+  Slick = Slick || {};
+  Slick.Editors = Slick.Editors || {};
+  Object.assign(Slick.Editors, {
+    "Text": TextEditor,
+    "Integer": IntegerEditor,
+    "Float": FloatEditor,
+    "Date": DateEditor,
+    "YesNoSelect": YesNoSelectEditor,
+    "Checkbox": CheckboxEditor,
+    "PercentComplete": PercentCompleteEditor,
+    "LongText": LongTextEditor,
+    "Formula": FreeFormFormulaEditor
   });
+
+  const keyCodes = {
+    ENTER: 13,
+    ESCAPE: 27,
+    TAB: 9,
+    LEFT: 37,
+    RIGHT: 39
+  };
+
+function FreeFormFormulaEditor(args) {
+  console.log('newly created formula editor:', args);
+  Object.assign(this, {args, input: null, defaultValue: null});
+  this.init();
+}
+
+Object.assign(FreeFormFormulaEditor.prototype, {
+  init: function () {
+    console.log('formula editor - init');
+    const navOnLR = this.args.grid.getOptions().editorCellNavOnLRKeys;
+    this.input = $('<input type="text" class="editor-text"/>').appendTo(this.args.container)
+      .on('keydown.nav', navOnLR ? handleKeydownLRNav : handleKeydownLRNoNav).focus().select();
+  },
+  destroy: function () {
+    console.log('formula editor - destroy');
+    this.input.remove();
+  },
+  focus: function () {
+    console.log('formula editor - focus');
+    this.input.focus();
+  },
+  getValue: function () {
+    console.log('formula editor - get value', this.input.val());
+    return this.input.val();
+  },
+  setValue: function (value) {
+    console.log('formula editor - set value', value);
+    this.input.val(value);
+  },
+  loadValue: function (row) {
+    console.log('formula editor - load value', row);
+    this.defaultValue = row[this.args.column.field] || "";
+    this.input.val(this.defaultValue);
+    this.input[0].defaultValue = this.defaultValue;
+    this.input.select();
+  },
+  serializeValue: function () {
+    console.log('formula editor - serialize value', this.input.val());
+    return this.input.val();
+  },
+  applyValue: function (row, newValue) {
+    console.log('formula editor - apply value:', JSON.stringify(row, null, 2), newValue);
+    row[this.args.column.field] = newValue;
+  },
+  isValueChanged: function () {
+    console.log('formula editor - is value changed');
+    return (!(this.input.val() === "" && this.defaultValue === null)) && (this.input.val() !== this.defaultValue);
+  },
+  validate: function () {
+    console.log('formula editor - validate');
+    return {
+      valid: true,
+      msg: null
+    };
+  }
+});
 
   function TextEditor(args) {
     var $input;
@@ -251,6 +315,10 @@
   FloatEditor.DefaultDecimalPlaces = null;
   FloatEditor.AllowEmptyValue = false;
 
+  function parseDate(date) {
+    return `${date.getFullYear()}-${String(1 + date.getMonth()).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
   function DateEditor(args) {
     var $input;
     var defaultValue;
@@ -258,38 +326,41 @@
     var calendarOpen = false;
 
     this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
+      $input = $("<INPUT type=date class='editor-text' />");
       $input.appendTo(args.container);
       $input.focus().select();
-      $input.datepicker({
-        showOn: "button",
-        buttonImageOnly: true,
-         beforeShow: function () {
-          calendarOpen = true
-        },
-        onClose: function () {
-          calendarOpen = false
-        }
-      });
+      // $input.datepicker({
+      //   showOn: "button",
+      //   buttonImageOnly: true,
+      //    beforeShow: function () {
+      //     calendarOpen = true
+      //   },
+      //   onClose: function () {
+      //     calendarOpen = false
+      //   }
+      // });
       $input.width($input.width() - 18);
     };
 
     this.destroy = function () {
-      $.datepicker.dpDiv.stop(true, true);
-      $input.datepicker("hide");
-      $input.datepicker("destroy");
+      // $.datepicker.dpDiv.stop(true, true);
+      // $input.datepicker("hide");
+      // $input.datepicker("destroy");
       $input.remove();
     };
 
     this.show = function () {
       if (calendarOpen) {
-        $.datepicker.dpDiv.stop(true, true).show();
+        // $.datepicker.dpDiv.stop(true, true).show();
+        $input.focus().select();
       }
+
     };
 
     this.hide = function () {
       if (calendarOpen) {
-        $.datepicker.dpDiv.stop(true, true).hide();
+
+        // $.datepicker.dpDiv.stop(true, true).hide();
       }
     };
 
@@ -297,9 +368,9 @@
       if (!calendarOpen) {
         return;
       }
-      $.datepicker.dpDiv
-          .css("top", position.top + 30)
-          .css("left", position.left);
+      // $.datepicker.dpDiv
+      //     .css("top", position.top + 30)
+      //     .css("left", position.left);
     };
 
     this.focus = function () {
@@ -307,8 +378,12 @@
     };
 
     this.loadValue = function (item) {
+      console.log('item:', item);
       defaultValue = item[args.column.field];
-      $input.val(defaultValue);
+      console.log('type:', typeof defaultValue);
+      const date = typeof defaultValue === 'object' ? parseDate(defaultValue) : parseDate(new Date(defaultValue));
+      console.log('defaultValue:', defaultValue, 'date:', date);
+      $input.val(date);
       $input[0].defaultValue = defaultValue;
       $input.select();
     };
@@ -527,6 +602,7 @@
     var defaultValue;
     var scope = this;
 
+
     this.init = function () {
       var $container = $("body");
       var navOnLR = args.grid.getOptions().editorCellNavOnLRKeys;
@@ -548,26 +624,28 @@
       $input.focus().select();
     };
 
+
+
     this.handleKeyDown = function (e) {
-      if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
+      if (e.which === keyCodes.ENTER && e.ctrlKey) {
         scope.save();
-      } else if (e.which == $.ui.keyCode.ESCAPE) {
+      } else if (e.which === keyCodes.ESCAPE) {
         e.preventDefault();
         scope.cancel();
-      } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
+      } else if (e.which === keyCodes.TAB && e.shiftKey) {
         e.preventDefault();
         args.grid.navigatePrev();
-      } else if (e.which == $.ui.keyCode.TAB) {
+      } else if (e.which === keyCodes.TAB) {
         e.preventDefault();
         args.grid.navigateNext();
-      } else if (e.which == $.ui.keyCode.LEFT || e.which == $.ui.keyCode.RIGHT) {
+      } else if (e.which === keyCodes.LEFT || e.which === keyCodes.RIGHT) {
         if (args.grid.getOptions().editorCellNavOnLRKeys) {
           var cursorPosition = this.selectionStart;
           var textLength = this.value.length;
-          if (e.keyCode === $.ui.keyCode.LEFT && cursorPosition === 0) {
+          if (e.keyCode === keyCodes.LEFT && cursorPosition === 0) {
             args.grid.navigatePrev();
           }
-          if (e.keyCode === $.ui.keyCode.RIGHT && cursorPosition >= textLength-1) {
+          if (e.keyCode === keyCodes.RIGHT && cursorPosition >= textLength-1) {
             args.grid.navigateNext();
           }
         }
@@ -647,16 +725,16 @@
   function handleKeydownLRNav(e) {
     var cursorPosition = this.selectionStart;
     var textLength = this.value.length;
-    if ((e.keyCode === $.ui.keyCode.LEFT && cursorPosition > 0) ||
-         e.keyCode === $.ui.keyCode.RIGHT && cursorPosition < textLength-1) {
+    if ((e.keyCode === keyCodes.LEFT && cursorPosition > 0) ||
+         e.keyCode === keyCodes.RIGHT && cursorPosition < textLength-1) {
       e.stopImmediatePropagation();
     }
   }
 
   function handleKeydownLRNoNav(e) {
-    if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {	
+    if (e.keyCode === keyCodes.LEFT || e.keyCode === keyCodes.RIGHT) {
       e.stopImmediatePropagation();	
     }	
   }
   
-})(jQuery);
+// })(jQuery);

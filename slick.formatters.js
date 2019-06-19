@@ -8,19 +8,16 @@
  * @namespace Slick
  */
 
-(function ($) {
+// (function ($) {
   // register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "Formatters": {
+Slick = Slick || {};
+Slick.Formatters = Slick.Formatters || {};
+Object.assign(Slick.Formatters, {
         "PercentComplete": PercentCompleteFormatter,
         "PercentCompleteBar": PercentCompleteBarFormatter,
         "YesNo": YesNoFormatter,
         "Checkmark": CheckmarkFormatter,
         "Checkbox": CheckboxFormatter
-
-      }
-    }
   });
 
   function PercentCompleteFormatter(row, cell, value, columnDef, dataContext) {
@@ -62,4 +59,4 @@
   function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
     return value ? "<img src='../images/tick.png'>" : "";
   }
-})(jQuery);
+// })(jQuery);

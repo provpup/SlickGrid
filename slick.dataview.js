@@ -1,17 +1,12 @@
-(function ($) {
-  $.extend(true, window, {
-    Slick: {
-      Data: {
-        DataView: DataView,
-        Aggregators: {
-          Avg: AvgAggregator,
-          Min: MinAggregator,
-          Max: MaxAggregator,
-          Sum: SumAggregator
-        }
-      }
-    }
-  });
+  Slick = Slick || {};
+  Slick.Data = Slick.Data || {};
+  Object.assign(Slick.Data, {DataView: DataView,
+    Aggregators: {
+      Avg: AvgAggregator,
+      Min: MinAggregator,
+      Max: MaxAggregator,
+      Sum: SumAggregator
+    }}) ;
 
 
   /***
@@ -82,7 +77,7 @@
     var onRowsOrCountChanged = new Slick.Event();
     var onPagingInfoChanged = new Slick.Event();
 
-    options = $.extend(true, {}, defaults, options);
+    options = {...defaults, ...options};
 
 
     function beginUpdate() {
@@ -244,7 +239,8 @@
       groupingInfos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
 
       for (var i = 0; i < groupingInfos.length; i++) {
-        var gi = groupingInfos[i] = $.extend(true, {}, groupingInfoDefaults, groupingInfos[i]);
+        var gi = groupingInfos[i] = {...groupingInfoDefaults, ...groupingInfos[i]};//.extend(true, {},
+        // groupingInfoDefaults, groupingInfos[i]);
         gi.getterIsAFn = typeof gi.getter === "function";
 
         // pre-compile accumulator loops
@@ -1032,7 +1028,8 @@
           setSelectedRowIds(newSelectedRowIds);
         } else {
           // keep the ones that are hidden
-          var existing = $.grep(selectedRowIds, function(id) { return self.getRowById(id) === undefined; });
+          var existing = selectedRowIds.filter(function(id) { return self.getRowById(id) === undefined;});//.grep(selectedRowIds, function(id) { return self.getRowById(id)
+          // === undefined; });
           // add the newly selected ones
           setSelectedRowIds(existing.concat(newSelectedRowIds));
         }
@@ -1089,7 +1086,7 @@
       this.onRowsOrCountChanged.subscribe(update);
     }
 
-    $.extend(this, {
+    Object.assign(this, {
       // methods
       "beginUpdate": beginUpdate,
       "endUpdate": endUpdate,
@@ -1246,4 +1243,4 @@
   // TODO:  add more built-in aggregators
   // TODO:  merge common aggregators in one to prevent needles iterating
 
-})(jQuery);
+// })(jQuery);

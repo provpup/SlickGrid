@@ -4,67 +4,66 @@
  * @namespace Slick
  */
 
-(function ($) {
-  // register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "Event": Event,
-      "EventData": EventData,
-      "EventHandler": EventHandler,
-      "Range": Range,
-      "NonDataRow": NonDataItem,
-      "Group": Group,
-      "GroupTotals": GroupTotals,
-      "EditorLock": EditorLock,
-  
-      /***
-       * A global singleton editor lock.
-       * @class GlobalEditorLock
-       * @static
-       * @constructor
-       */
-      "GlobalEditorLock": new EditorLock(),
-      "TreeColumns": TreeColumns,
+var Slick;
+// window.addEventListener('DOMContentLoaded', function (event) {
+//   console.log('DOMContentLoaded');
+  Slick = Object.assign({}, {
+    "Event": Event,
+    "EventData": EventData,
+    "EventHandler": EventHandler,
+    "Range": Range,
+    "NonDataRow": NonDataItem,
+    "Group": Group,
+    "GroupTotals": GroupTotals,
+    "EditorLock": EditorLock,
 
-      "keyCode": {
-        SPACE: 8,
-        BACKSPACE: 8,
-        DELETE: 46,
-        DOWN: 40,
-        END: 35,
-        ENTER: 13,
-        ESCAPE: 27,
-        HOME: 36,
-        INSERT: 45,
-        LEFT: 37,
-        PAGE_DOWN: 34,
-        PAGE_UP: 33,
-        RIGHT: 39,
-        TAB: 9,
-        UP: 38,
-        A: 65
-      },
-      "preClickClassName" : "slick-edit-preclick",
-      
-      "ViewportMode": {
-        IgnoreViewport: 'IGV',
-        FitColsToViewport: 'FCV',
-        FitViewportToCols: 'FVC'
-      },
-      
-      "AutoWidthStrategy": {
-          Locked: 'LK',
-          Guide: 'GU',
-          Top1Row: 'TOP1',
-          TopNRows: 'TOPN',
-          AllRows: 'ALL'
-      }      
+    /***
+     * A global singleton editor lock.
+     * @class GlobalEditorLock
+     * @static
+     * @constructor
+     */
+    "GlobalEditorLock": new EditorLock(),
+    "TreeColumns": TreeColumns,
+
+    "keyCode": {
+      SPACE: 8,
+      BACKSPACE: 8,
+      DELETE: 46,
+      DOWN: 40,
+      END: 35,
+      ENTER: 13,
+      ESCAPE: 27,
+      HOME: 36,
+      INSERT: 45,
+      LEFT: 37,
+      PAGE_DOWN: 34,
+      PAGE_UP: 33,
+      RIGHT: 39,
+      TAB: 9,
+      UP: 38,
+      A: 65
+    },
+    "preClickClassName" : "slick-edit-preclick",
+
+    "ViewportMode": {
+      IgnoreViewport: 'IGV',
+      FitColsToViewport: 'FCV',
+      FitViewportToCols: 'FVC'
+    },
+
+    "AutoWidthStrategy": {
+      Locked: 'LK',
+      Guide: 'GU',
+      Top1Row: 'TOP1',
+      TopNRows: 'TOPN',
+      AllRows: 'ALL'
     }
   });
 
   if (Object.freeze) { Object.freeze(Slick.ViewportMode); }
   if (Object.freeze) { Object.freeze(Slick.AutoWidthStrategy); }
-    
+
   /***
    * An event object for passing data to event handlers and letting them control propagation.
    * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
@@ -185,7 +184,7 @@
       var i = handlers.length;
       while (i--) {
         if (handlers[i].event === event &&
-            handlers[i].handler === handler) {
+          handlers[i].handler === handler) {
           handlers.splice(i, 1);
           event.unsubscribe(handler);
           return;
@@ -272,7 +271,7 @@
      */
     this.contains = function (row, cell) {
       return row >= this.fromRow && row <= this.toRow &&
-          cell >= this.fromCell && cell <= this.toCell;
+        cell >= this.fromCell && cell <= this.toCell;
     };
 
     /***
@@ -392,9 +391,9 @@
    */
   Group.prototype.equals = function (group) {
     return this.value === group.value &&
-        this.count === group.count &&
-        this.collapsed === group.collapsed &&
-        this.title === group.title;
+      this.count === group.count &&
+      this.collapsed === group.collapsed &&
+      this.title === group.title;
   };
 
   /***
@@ -621,7 +620,7 @@
     }
 
     function cloneTreeColumns() {
-      return $.extend(true, [], treeColumns);
+      return JSON.parse(JSON.stringify(treeColumns));//$.extend(true, [], treeColumns);
     }
 
     init();
@@ -679,6 +678,4 @@
       });
     }
   }
-})(jQuery);
-
-
+// });

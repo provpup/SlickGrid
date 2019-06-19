@@ -30,11 +30,8 @@ if (typeof Slick === "undefined") {
 
 (function ($) {
   // Slick.Grid
-  $.extend(true, window, {
-    Slick: {
-      Grid: SlickGrid
-    }
-  });
+  Slick = Slick || {};
+  Slick.Grid = SlickGrid;
 
   // shared across all grids on the page
   var scrollbarDimensions;
@@ -321,7 +318,7 @@ if (typeof Slick === "undefined") {
       // calculate these only once and share between grid instances
       maxSupportedCssHeight = maxSupportedCssHeight || getMaxSupportedCssHeight();
 
-      options = $.extend({}, defaults, options);
+      options = {...defaults, ...options, enableColumnReorder: false};//$.extend({}, defaults, options);
       validateAndEnforceOptions();
       columnDefaults.width = options.defaultColumnWidth;
 
@@ -331,7 +328,7 @@ if (typeof Slick === "undefined") {
       updateColumnProps();
 
       // validate loaded JavaScript modules against requested options
-      if (options.enableColumnReorder && !$.fn.sortable) {
+      if (options.enableColumnReorder/* && !$.fn.sortable*/) {
         throw new Error("SlickGrid's 'enableColumnReorder = true' option requires jquery-ui.sortable module to be loaded");
       }
 
@@ -5108,9 +5105,10 @@ if (typeof Slick === "undefined") {
 
       if (currentEditor) {
         if (currentEditor.isValueChanged()) {
-          var validationResults = currentEditor.validate();
+          // Disable validation
+          // var validationResults = currentEditor.validate();
 
-          if (validationResults.valid) {
+          // if (validationResults.valid) {
             if (activeRow < getDataLength()) {
               var editCommand = {
                 row: activeRow,
@@ -5155,7 +5153,7 @@ if (typeof Slick === "undefined") {
 
             // check whether the lock has been re-acquired by event handlers
             return !getEditorLock().isActive();
-          } else {
+          /*} else {
             // Re-add the CSS class to trigger transitions, if any.
             $(activeCellNode).removeClass("invalid");
             $(activeCellNode).width();  // force layout
@@ -5172,7 +5170,7 @@ if (typeof Slick === "undefined") {
 
             currentEditor.focus();
             return false;
-          }
+          }*/
         }
 
         makeActiveCellNormal();

@@ -50,7 +50,7 @@
   var grid;
   var data = [];
   var columns = [
-    {id: "title", name: "Title", field: "title", width: 120, cssClass: "cell-title", editor: Slick.Editors.Text},
+    {id: "title", name: "Title", field: "title", width: 120, cssClass: "cell-title", editor: Slick.Editors.Formula},
     {id: "range", name: "Range", width: 120, formatter: NumericRangeFormatter, editor: NumericRangeEditor}
   ];
 
@@ -98,7 +98,11 @@
     };
 
     this.serializeValue = function () {
-      return {from: parseInt($from.val(), 10), to: parseInt($to.val(), 10)};
+      // Bypass integer validation; if invalid number, then just return the string
+      const parsedFrom = parseInt($from.val(), 10);
+      const parsedTo = parseInt($to.val(), 10);
+      return {from: Number.isNaN(parsedFrom) ? $from.val() : parsedFrom, to: Number.isNaN(parsedTo) ? $to.val() :
+          parsedTo};
     };
 
     this.applyValue = function (item, state) {

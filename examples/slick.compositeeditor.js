@@ -149,7 +149,7 @@
         firstInvalidEditor = null;
 
         var idx = editors.length;
-        while (idx--) {
+        /* Remove validation while (idx--) {
           validationResults = editors[idx].validate();
           if (!validationResults.valid) {
             firstInvalidEditor = editors[idx];
@@ -160,7 +160,7 @@
               msg: validationResults.msg
             });
           }
-        }
+        } */
 
         if (errors.length) {
           return {
